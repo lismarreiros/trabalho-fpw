@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema de Tarefas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- header -->
+<header>
+    <div class="logo">
+        <div class="logo-dot"></div>
+        To Do List
+    </div>
+    <div class="header-stats">
+        <div class="stat">
+            <div class="stat-num" id="stat-total">0</div>
+            <div class="stat-label">Total</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num" id="stat-done">0</div>
+            <div class="stat-label">Concluídas</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num" id="stat-pend">0</div>
+            <div class="stat-label">Pendentes</div>
+        </div>
+    </div>
+</header>
+
+<!-- principal -->
+<main>
+    <!-- hero -->
+    <section class="hero" aria-label="Apresentação">
+        <h1>Gerencie suas<br><span>tarefas</span> com foco.</h1>
+        <p>Cadastre, organize e conclua.</p>
+    </section>
+
+    <!-- formulário -->
+    <section class="form-card" aria-label="Cadastrar tarefa">
+        <div class="form-title">Nova Tarefa</div>
+        <div class="form-grid">
+
+            <!-- título -->
+            <div class="form-group full">
+                <label for="inp-titulo">Título</label>
+                <input type="text" id="inp-titulo" placeholder="Ex.: Estudar JavaScript" maxlength="100" />
+                <span class="error-msg" id="err-titulo">O título é obrigatório.</span>
+            </div>
+
+            <!-- descrição -->
+            <div class="form-group full">
+                <label for="inp-desc">Descrição</label>
+                <textarea id="inp-desc" placeholder="Descreva o que precisa ser feito..." maxlength="400"></textarea>
+                <span class="error-msg" id="err-desc">A descrição é obrigatória.</span>
+            </div>
+
+            <!-- nível de prioridade -->
+            <div class="form-group">
+                <label for="inp-prioridade">Prioridade</label>
+                <select id="inp-prioridade">
+                    <option value="">Selecione...</option>
+                    <option value="Baixa">Baixa</option>
+                    <option value="Média">Média</option>
+                    <option value="Alta">Alta</option>
+                </select>
+                <span class="error-msg" id="err-prioridade">Selecione a prioridade.</span>
+            </div>
+
+            <!-- status -->
+            <div class="form-group">
+                <label for="inp-status">Status</label>
+                <select id="inp-status">
+                    <option value="Pendente">Pendente</option>
+                    <option value="Concluída">Concluída</option>
+                </select>
+            </div>
+
+            <!-- botão adicionar -->
+            <button class="btn-add" onclick="cadastrarTarefa()">Adicionar Tarefa</button>
+
+        </div>
+    </section>
+
+    <!-- busca e filtros -->
+    <div class="toolbar" role="search" aria-label="Busca e filtros">
+        <div class="search-wrap">
+            <input type="text" id="inp-busca" placeholder="Pesquisar tarefas pelo título..." oninput="renderizarLista()" />
+        </div>
+        <button class="filter-btn active" id="filtro-todos"     onclick="aplicarFiltro('todos', this)">Todas</button>
+        <button class="filter-btn"        id="filtro-pendente"  onclick="aplicarFiltro('Pendente', this)">Pendentes</button>
+        <button class="filter-btn"        id="filtro-concluida" onclick="aplicarFiltro('Concluída', this)">Concluídas</button>
+    </div>
+
+    <!-- lista de Tarefas -->
+    <section class="tasks-section" aria-label="Lista de tarefas">
+        <div class="section-header">
+            <div class="section-title">Tarefas</div>
+            <div class="tasks-count" id="tasks-count">0 tarefas</div>
+        </div>
+
+        <!-- mensagem de lista vazia -->
+        <div class="empty-state" id="empty-state">
+            <h3>Nenhuma tarefa encontrada</h3>
+            <p>Adicione sua primeira tarefa acima!</p>
+        </div>
+
+        <div class="task-list" id="task-list" aria-live="polite"></div>
+    </section>
+
+</main>
+
+<footer>
+    <nav aria-label="Rodapé">
+        Sistema de Tarefas — Fundamentos de Programação Web · Lis Isabelle Nogueira Marreiros
+    </nav>
+</footer>
+
+<!-- modal pra editar -->
+<div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-label="Editar tarefa">
+    <div class="modal">
+        <div class="modal-title"> Editar Tarefa</div>
+        <div class="modal-grid">
+
+            <div class="form-group">
+                <label for="edit-titulo">Título</label>
+                <input type="text" id="edit-titulo" maxlength="100" />
+                <span class="error-msg" id="edit-err-titulo">O título é obrigatório.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="edit-desc">Descrição</label>
+                <textarea id="edit-desc" maxlength="400"></textarea>
+                <span class="error-msg" id="edit-err-desc">A descrição é obrigatória.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="edit-prioridade">Prioridade</label>
+                <select id="edit-prioridade">
+                    <option value="Baixa">Baixa</option>
+                    <option value="Média">Média</option>
+                    <option value="Alta">Alta</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="edit-status">Status</label>
+                <select id="edit-status">
+                    <option value="Pendente">Pendente</option>
+                    <option value="Concluída">Concluída</option>
+                </select>
+            </div>
+
+        </div>
+        <div class="modal-actions">
+            <button class="btn-save"   onclick="salvarEdicao()">Salvar alterações</button>
+            <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- notificações -->
+<div class="toast" id="toast" role="status" aria-live="polite">
+    <span class="toast-icon" id="toast-icon"></span>
+    <span id="toast-msg"></span>
+</div>
+
+<script src="index.js"></script>
+
+</body>
+</html>
